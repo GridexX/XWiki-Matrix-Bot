@@ -1,17 +1,17 @@
 {
-  "name": "matrix-bot-sdk-bot-template",
+  "name": "XWiki-matrix-bot",
   "version": "0.1.0",
-  "author": "TravisR",
+  "author": "Clément and Arsène",
   "license": "Apache-2.0",
-  "description": "A template repository for bots made with the matrix-bot-sdk",
+  "description": "A POC to query the XWiki API within a Matrix Bot",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/turt2live/matrix-bot-sdk-bot-template.git"
+    "url": "git+https://github.com/C-Iaens/XWiki-Matrix.git"
   },
   "bugs": {
-    "url": "https://github.com/turt2live/matrix-bot-sdk-bot-template/issues"
+    "url": "https://github.com/C-Iaens/XWiki-Matrix/issues"
   },
-  "homepage": "https://github.com/turt2live/matrix-bot-sdk-bot-template#readme",
+  "homepage": "https://github.com/C-Iaens/XWiki-Matrix#readme",
   "keywords": [
     "matrix",
     "bot",

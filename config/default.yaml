@@ -16,3 +16,6 @@ autoJoin: true
 
 # Location on disk for where to store various bot information.
 dataPath: "storage"
+
+xwikiUrl: "https://www.xwiki.org"
+

@@ -10,6 +10,7 @@ interface IConfig {
     accessToken: string;
     autoJoin: boolean;
     dataPath: string;
+    xwikiUrl: string;
 }
 
 export default <IConfig>config;
