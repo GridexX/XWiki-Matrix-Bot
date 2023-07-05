@@ -3,6 +3,7 @@ import { runHelloCommand } from "./hello";
 import { runPingCommand } from "./ping";
 import { runEchoCommand } from "./echo";
 import { runInfoCommand } from "./info";
+import { runSumCommand } from "./sum";
 import * as htmlEscape from "escape-html";
 
 // The prefix required to trigger the bot. The bot will also respond
@@ -64,6 +65,8 @@ export default class CommandHandler {
                 case "ping": { return runPingCommand(roomId, event, args, this.client); }
                 case "echo": { return runEchoCommand(roomId, event, args, this.client); }
                 case "info": { return runInfoCommand(roomId, event, args, this.client); }
+                case "sum": { return runSumCommand(roomId, event, args, this.client); }
+
                 default: {
                     const help = "" +
                         "!bot hello [user]     - Say hello to a user.\n" +
