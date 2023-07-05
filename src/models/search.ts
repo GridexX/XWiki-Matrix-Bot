@@ -28,3 +28,7 @@ export type LinkSearchResult = {
     href: string;
     rel: string;
 };
+
+export type PageSearchResult = {
+    xwikiAbsoluteUrl: string;
+};

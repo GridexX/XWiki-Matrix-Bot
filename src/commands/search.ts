@@ -5,11 +5,14 @@ import {
     MessageEventContent,
     RichReply,
 } from "matrix-bot-sdk";
-import { SearchResult, SearchResults } from "../models/search";
+import {
+    PageSearchResult,
+    SearchResult,
+    SearchResults,
+} from "../models/search";
 import { MessageSearch } from "../models/messageSearch";
+import { error } from "console";
 
-const urlRegex =
-    /(http.*?:\/\/)(.*?)([.].*?)(\/rest\/wikis\/)(.*?)\/spaces\/(.*)/;
 const xwikiUrl = process.env.XWIKI_URL || "https://www.xwiki.org";
 // const xwikiUsername = process.env.XWIKI_USERNAME;
 // const xwikiPassword = process.env.XWIKI_PASSWORD;
@@ -20,29 +23,32 @@ axios.interceptors.request.use((config) => {
     return config;
 });
 
-function searchXWiki(query: string): Promise<AxiosResponse<any>> {
+function searchPage(url: string): Promise<AxiosResponse<PageSearchResult>> {
+    return axios.get(`${url}?media=json`);
+}
+
+function searchXWiki(query: string): Promise<AxiosResponse<SearchResults>> {
     const url = `${xwikiUrl}/xwiki/rest/wikis/query?media=json&prettyNames=true&type=solr&q=${query}`;
     return axios.get(url);
 }
 
-// TODO: Instead, request the first link in the HREF Array. Find the URL behind the <xwikiAbsoluteUrl></xwikiAbsoluteUrl> TAG
-function replaceUrl(url: string): string {
-    let urlReplace = url.replace("/xwiki/rest/wikis", "");
-    urlReplace = urlReplace.replace("/pages/WebHome", "");
-    urlReplace = urlReplace.replace("/spaces", "");
-    urlReplace = urlReplace.replace("%20", " ");
-    urlReplace = urlReplace.replace(xwikiUrl, `${xwikiUrl}/bin/view`);
-    return urlReplace;
+async function getHrefFromPage(url: string): Promise<string> {
+    const pageResult = await searchPage(url);
+    return pageResult.data.xwikiAbsoluteUrl;
 }
 
 // This function takes the results from the REST API and converts them into message data for the BOT
-function convertSearchResults(searchResults: SearchResult[]): MessageSearch {
+async function convertSearchResults(
+    searchResults: SearchResult[]
+): Promise<MessageSearch> {
     let messageSearch: MessageSearch = {
         results: searchResults.length,
         data: [],
     };
 
-    searchResults.forEach((searchResult) => {
+    for (let index = 0; index < searchResults.length; index++) {
+        const searchResult = searchResults[index];
+        const href = await getHrefFromPage(searchResult.links[0].href);
         messageSearch.data.push({
             author: searchResult.author,
             authorName: searchResult.authorName,
@@ -50,11 +56,9 @@ function convertSearchResults(searchResults: SearchResult[]): MessageSearch {
             pageFullName: searchResult.pageFullName,
             title: searchResult.title,
             score: searchResult.score,
-            href: replaceUrl(searchResult.links[0].href),
+            href,
         });
-    });
-
-    //TODO Sort result based on score
+    }
 
     return messageSearch;
 }
@@ -94,9 +98,9 @@ export async function runSearchCommand(
     const query = echo.join(" ");
 
     searchXWiki(query)
-        .then((response: AxiosResponse<SearchResults>) => {
+        .then(async (response: AxiosResponse<SearchResults>) => {
             const data = response.data;
-            const result = convertSearchResults(data.searchResults);
+            const result = await convertSearchResults(data.searchResults);
 
             // Return the result to the chat
             return client
