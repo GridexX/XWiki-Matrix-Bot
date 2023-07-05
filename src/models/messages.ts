@@ -12,3 +12,14 @@ type SearchData = {
     authorName: string;
     modified: Date;
 };
+
+export type MessageListUser = {
+    results: number;
+    data: UserData[];
+};
+
+export type UserData = {
+    name: string;
+    href: string;
+    modified: Date;
+};

@@ -10,12 +10,8 @@ import {
     SearchResult,
     SearchResults,
 } from "../models/search";
-import { MessageSearch } from "../models/messageSearch";
-import { error } from "console";
-
-const xwikiUrl = process.env.XWIKI_URL || "https://www.xwiki.org";
-// const xwikiUsername = process.env.XWIKI_USERNAME;
-// const xwikiPassword = process.env.XWIKI_PASSWORD;
+import { MessageSearch } from "../models/messages";
+import { QUERY_API_URL } from "../constants/api";
 
 axios.interceptors.request.use((config) => {
     config.headers.Accept = "application/json";
@@ -28,7 +24,7 @@ function searchPage(url: string): Promise<AxiosResponse<PageSearchResult>> {
 }
 
 function searchXWiki(query: string): Promise<AxiosResponse<SearchResults>> {
-    const url = `${xwikiUrl}/xwiki/rest/wikis/query?media=json&prettyNames=true&type=solr&q=${query}`;
+    const url = `${QUERY_API_URL}/query?media=json&prettyNames=true&type=solr&q=${query}`;
     return axios.get(url);
 }
 
@@ -89,7 +85,6 @@ function createRichMessage(
 export async function runSearchCommand(
     roomId: string,
     ev: any,
-    event: MessageEvent<MessageEventContent>,
     args: string[],
     client: MatrixClient
 ) {

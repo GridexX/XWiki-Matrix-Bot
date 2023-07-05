@@ -12,6 +12,7 @@ import { runInfoCommand } from "./info";
 import { runSumCommand } from "./sum";
 import { runSearchCommand } from "./search";
 import * as htmlEscape from "escape-html";
+import { listUsers } from "./listUsers";
 
 // The prefix required to trigger the bot. The bot will also respond
 // to being pinged directly.
@@ -91,19 +92,17 @@ export default class CommandHandler {
                     return runSumCommand(roomId, event, args, this.client);
                 }
                 case "search": {
-                    return runSearchCommand(
-                        roomId,
-                        event,
-                        ev,
-                        args,
-                        this.client
-                    );
+                    return runSearchCommand(roomId, ev, args, this.client);
                 }
+                case "users": {
+                    return listUsers(roomId, ev, this.client);
+                }
+
                 default: {
                     const help =
                         "" +
-                        "!bot hello [user]     - Say hello to a user.\n" +
-                        "!bot help             - This menu\n";
+                        "!aibot hello [user]     - Say hello to a user.\n" +
+                        "!aibot help             - This menu\n";
 
                     const text = `Help menu:\n${help}`;
                     const html = `<b>Help menu:</b><br /><pre><code>${htmlEscape(
