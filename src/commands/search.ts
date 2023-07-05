@@ -11,7 +11,7 @@ import {
     SearchResults,
 } from "../models/search";
 import { MessageSearch } from "../models/messages";
-import { QUERY_API_URL } from "../constants/api";
+import { MAX_ROW, QUERY_API_URL } from "../constants/api";
 
 axios.interceptors.request.use((config) => {
     config.headers.Accept = "application/json";
@@ -24,7 +24,7 @@ function searchPage(url: string): Promise<AxiosResponse<PageSearchResult>> {
 }
 
 function searchXWiki(query: string): Promise<AxiosResponse<SearchResults>> {
-    const url = `${QUERY_API_URL}/query?media=json&prettyNames=true&type=solr&q=${query}`;
+    const url = `${QUERY_API_URL}/query?media=json&prettyNames=true&type=solr&number=${MAX_ROW}&q=${query}`;
     return axios.get(url);
 }
 
