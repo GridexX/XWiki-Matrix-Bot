@@ -101,7 +101,9 @@ export default class CommandHandler {
                 default: {
                     const help =
                         "" +
-                        "!aibot hello [user]     - Say hello to a user.\n" +
+                        "!aibot search [words]     - Search for pages into an XWiki instance\n" +
+                        "!aibot users     - List users in XWiki \n" +
+                        "!aibot ask [question]     - Ask a question based on XWiki details\n" +
                         "!aibot help             - This menu\n";
 
                     const text = `Help menu:\n${help}`;
