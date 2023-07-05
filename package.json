@@ -19,22 +19,23 @@
   ],
   "main": "lib/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "npx tsc",
     "lint": "tslint --project ./tsconfig.json -t stylish",
     "start:dev": "npm run build && node lib/index.js"
   },
   "dependencies": {
     "node-fetch": "3.3.1",
-    "config": "^3.3.1",
-    "escape-html": "^1.0.3",
     "js-yaml": "^3.13.1",
     "jsdom": "^22.1.0",
-    "matrix-bot-sdk": "^0.5.3",
-    "openai": "^3.3.0"
+    "openai": "^3.3.0",
+    "axios": "^1.4.0",
+    "config": "^3.3.9",
+    "escape-html": "^1.0.3",
+    "matrix-bot-sdk": "^0.6.6"
   },
   "devDependencies": {
     "@types/node": "^12.12.37",
     "tslint": "^6.1.2",
-    "typescript": "^3.8.3"
+    "typescript": "^5.0.4"
   }
 }

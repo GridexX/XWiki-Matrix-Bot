@@ -1,9 +1,16 @@
-import { LogService, MatrixClient, MessageEvent, RichReply, UserID } from "matrix-bot-sdk";
+import {
+    LogService,
+    MatrixClient,
+    MessageEvent,
+    RichReply,
+    UserID,
+} from "matrix-bot-sdk";
 import { runHelloCommand } from "./hello";
 import { runPingCommand } from "./ping";
 import { runEchoCommand } from "./echo";
 import { runInfoCommand } from "./info";
 import { runSumCommand } from "./sum";
+import { runSearchCommand } from "./search";
 import * as htmlEscape from "escape-html";
 
 // The prefix required to trigger the bot. The bot will also respond
@@ -12,15 +19,13 @@ export const COMMAND_PREFIX = "!aibot";
 
 // This is where all of our commands will be handled
 export default class CommandHandler {
-
     // Just some variables so we can cache the bot's display name and ID
     // for command matching later.
     private displayName: string;
     private userId: string;
     private localpart: string;
 
-    constructor(private client: MatrixClient) {
-    }
+    constructor(private client: MatrixClient) {}
 
     public async start() {
         // Populate the variables above (async)
@@ -36,7 +41,8 @@ export default class CommandHandler {
 
         try {
             const profile = await this.client.getUserProfile(this.userId);
-            if (profile && profile['displayname']) this.displayName = profile['displayname'];
+            if (profile && profile["displayname"])
+                this.displayName = profile["displayname"];
         } catch (e) {
             // Non-fatal error - we'll just log it and move on.
             LogService.warn("CommandHandler", e);
@@ -51,29 +57,58 @@ export default class CommandHandler {
 
         // Ensure that the event is a command before going on. We allow people to ping
         // the bot as well as using our COMMAND_PREFIX.
-        const prefixes = [COMMAND_PREFIX, `${this.localpart}:`, `${this.displayName}:`, `${this.userId}:`];
-        const prefixUsed = prefixes.find(p => event.textBody.startsWith(p));
+        const prefixes = [
+            COMMAND_PREFIX,
+            `${this.localpart}:`,
+            `${this.displayName}:`,
+            `${this.userId}:`,
+        ];
+        const prefixUsed = prefixes.find((p) => event.textBody.startsWith(p));
         if (!prefixUsed) return; // Not a command (as far as we're concerned)
 
         // Check to see what the arguments were to the command
-        const args = event.textBody.substring(prefixUsed.length).trim().split(' ');
+        const args = event.textBody
+            .substring(prefixUsed.length)
+            .trim()
+            .split(" ");
 
         // Try and figure out what command the user ran, defaulting to help
         try {
             switch (args[0]) {
-                case "hello": { return runHelloCommand(roomId, event, args, this.client); }
-                case "ping": { return runPingCommand(roomId, event, args, this.client); }
-                case "echo": { return runEchoCommand(roomId, event, args, this.client); }
-                case "info": { return runInfoCommand(roomId, event, args, this.client); }
-                case "sum": { return runSumCommand(roomId, event, args, this.client); }
-
+                case "hello": {
+                    return runHelloCommand(roomId, event, args, this.client);
+                }
+                case "ping": {
+                    return runPingCommand(roomId, event, args, this.client);
+                }
+                case "echo": {
+                    return runEchoCommand(roomId, event, args, this.client);
+                }
+                case "info": {
+                    return runInfoCommand(roomId, event, args, this.client);
+                }
+                case "sum": {
+                    return runSumCommand(roomId, event, args, this.client);
+                }
+                case "search": {
+                    return runSearchCommand(
+                        roomId,
+                        event,
+                        ev,
+                        args,
+                        this.client
+                    );
+                }
                 default: {
-                    const help = "" +
+                    const help =
+                        "" +
                         "!bot hello [user]     - Say hello to a user.\n" +
                         "!bot help             - This menu\n";
 
                     const text = `Help menu:\n${help}`;
-                    const html = `<b>Help menu:</b><br /><pre><code>${htmlEscape(help)}</code></pre>`;
+                    const html = `<b>Help menu:</b><br /><pre><code>${htmlEscape(
+                        help
+                    )}</code></pre>`;
                     const reply = RichReply.createFor(roomId, ev, text, html); // Note that we're using the raw event, not the parsed one!
                     reply["msgtype"] = "m.notice"; // Bots should always use notices
                     return this.client.sendMessage(roomId, reply);

@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        // "skipLibCheck": true,
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
         "module": "commonjs",
@@ -14,5 +15,8 @@
     },
     "include": [
         "./src/**/*"
+    ],
+    "exclude": [
+        "node_modules"
     ]
 }
