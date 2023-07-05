@@ -4,6 +4,7 @@ export type MessageSearch = {
 };
 
 type SearchData = {
+    resume: string;
     pageFullName: string;
     title: string;
     href: string;

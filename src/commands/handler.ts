@@ -11,6 +11,7 @@ import { runEchoCommand } from "./echo";
 import { runInfoCommand } from "./info";
 import { runSumCommand } from "./sum";
 import { runSearchCommand } from "./search";
+import { runAskCommand } from "./ask";
 import * as htmlEscape from "escape-html";
 import { listUsers } from "./listUsers";
 
@@ -98,6 +99,9 @@ export default class CommandHandler {
                     return listUsers(roomId, ev, this.client);
                 }
 
+                case "ask": {
+                    return runAskCommand(roomId, event, args, this.client);
+                }
                 default: {
                     const help =
                         "" +

@@ -1,37 +1,64 @@
 import { MatrixClient, MessageEvent, MessageEventContent } from "matrix-bot-sdk";
-import { JSDOM } from 'jsdom';
-import { summarize } from './summurizer';
+import { Configuration, OpenAIApi } from "openai";
+import axios from "axios";
+import { JSDOM } from "jsdom";
+const Readability = require('@mozilla/readability').Readability;
 
 export async function runSumCommand(roomId: string, event: MessageEvent<MessageEventContent>, args: string[], client: MatrixClient) {
-    // Parse the URL from the command arguments
-    const url = args[1];
-    if (!url) {
-        console.log("Error: Invalid URL")
-        return;
-    }
+    const URL = args[1];
+    const apiKey = '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';
+    const maxTokens = 512;
+    const promptEnding = 'Please return a summary of the information above in a short paragraph in natural language';
 
+    // tslint:disable-next-line:no-shadowed-variable
+    const truncateText = (text: string, maxTokens: number) => {
+        let tokens = text.split(' ');
+        if (tokens.length > maxTokens) {
+            tokens = tokens.slice(0, maxTokens);
+        }
+        return tokens.join(' ');
+    };
+
+    let content;
     try {
-        // Send a GET request to the Wiki page
-        const response = await fetch(url);
-        const text = await response.text();
+        const response = await axios.get(URL);
+        const doc = new JSDOM(response.data);
+        const reader = new Readability(doc.window.document);
+        const article = reader.parse();
 
-        // Parse the HTML response
-        const dom = new JSDOM(text);
+        if (!article) {
+            console.log("Content is null for URL: ", URL);
+            content = "No Description Provided";
+        } else {
+            content = article.textContent;
+        }
 
-        // Extract the main content from the parsed HTML
-        const mainContent = dom.window.document.getElementById('mainContentArea').textContent;
+        const prompt = truncateText(content, maxTokens - promptEnding.length) + promptEnding;
 
-        // Generate a summary of the main content using an AI model
-        const summary = await summarize(mainContent);
+        const configuration = new Configuration({
+            apiKey: apiKey,
+        });
 
-        // Send the summary as a notice
+        const openai = new OpenAIApi(configuration);
+
+        const apiResponse = await openai.createCompletion({
+            model: "text-davinci-003",
+            prompt: prompt,
+            max_tokens: maxTokens,
+            temperature: 0.4,
+        });
+
+        let summary = apiResponse.data.choices[0].text.trim();
+        summary = summary.replace(/^\.\n/, '');
+
         return client.sendMessage(roomId, {
             body: summary,
             msgtype: "m.notice",
             format: "org.matrix.custom.html",
             formatted_body: summary,
         });
+
     } catch (error) {
-        console.error(error);
+        console.log("Error: ", error);
     }
 }

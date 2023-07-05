@@ -24,14 +24,17 @@
     "start:dev": "npm run build && node lib/index.js"
   },
   "dependencies": {
-    "node-fetch": "3.3.1",
-    "js-yaml": "^3.13.1",
-    "jsdom": "^22.1.0",
-    "openai": "^3.3.0",
+    "@mozilla/readability": "^0.4.4",
     "axios": "^1.4.0",
     "config": "^3.3.9",
     "escape-html": "^1.0.3",
-    "matrix-bot-sdk": "^0.6.6"
+    "js-yaml": "^3.13.1",
+    "jsdom": "^22.1.0",
+    "jsdon": "^0.1.15",
+    "matrix-bot-sdk": "^0.6.6",
+    "node-fetch": "3.3.1",
+    "node-readability": "^3.0.0",
+    "openai": "^3.3.0"
   },
   "devDependencies": {
     "@types/node": "^12.12.37",

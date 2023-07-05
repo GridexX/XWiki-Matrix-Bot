@@ -31,4 +31,5 @@ export type LinkSearchResult = {
 
 export type PageSearchResult = {
     xwikiAbsoluteUrl: string;
+    content: string;
 };

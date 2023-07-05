@@ -11,7 +11,8 @@
         "outDir": "./lib",
         "types": [
             "node"
-        ]
+        ],
+      "allowSyntheticDefaultImports": true
     },
     "include": [
         "./src/**/*"
