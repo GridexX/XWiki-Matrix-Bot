@@ -106,9 +106,9 @@ export default class CommandHandler {
                     const help =
                         "" +
                         "!aibot search [words]     - Search for pages into an XWiki instance\n" +
-                        "!aibot users     - List users in XWiki \n" +
+                        "!aibot users              - List users in XWiki \n" +
                         "!aibot ask [question]     - Ask a question based on XWiki details\n" +
-                        "!aibot help             - This menu\n";
+                        "!aibot help               - This menu\n";
 
                     const text = `Help menu:\n${help}`;
                     const html = `<b>Help menu:</b><br /><pre><code>${htmlEscape(
