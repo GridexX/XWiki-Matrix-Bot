@@ -1,4 +1,5 @@
 import type { RequestInfo, RequestInit, Response } from "node-fetch";
+import config from "../config";
 
 interface CompletionResponse {
     choices: {
@@ -7,8 +8,8 @@ interface CompletionResponse {
 }
 
 export default async function summarize(content: string): Promise<string> {
-    const API_URL = "https://api.openai.com/v1/completions";
-    const API_KEY = "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";
+    const API_URL = config.openai.url;
+    const API_KEY = config.openai.apiKey;
 
     const data = {
         model: "text-davinci-003",

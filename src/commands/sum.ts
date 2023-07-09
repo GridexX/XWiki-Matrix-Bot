@@ -2,6 +2,7 @@ import { MatrixClient } from "matrix-bot-sdk";
 import { Configuration, OpenAIApi } from "openai";
 import axios from "axios";
 import { JSDOM } from "jsdom";
+import config from "../config";
 
 const { Readability } = require("@mozilla/readability");
 
@@ -19,7 +20,7 @@ export default async function runSumCommand(
     client: MatrixClient
 ) {
     const URL = args[1];
-    const apiKey = "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";
+    const { apiKey } = config.openai;
     const maxTokens = 512;
     const promptEnding =
         "Please return a summary of the information above in a short paragraph in natural language";

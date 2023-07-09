@@ -8,6 +8,7 @@ import {
     SearchResults,
 } from "../models/searchModel";
 import { MessageSearch } from "../models/messages";
+import config from "../config";
 
 // axios.interceptors.request.use((config) => {
 //     config.headers.Accept = "application/json";
@@ -41,7 +42,7 @@ async function getResume(content_json: string): Promise<string> {
         truncateText(content_json, maxTokens - promptEnding.length) +
         promptEnding;
     const configuration = new Configuration({
-        apiKey: "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",
+        apiKey: config.openai.apiKey,
     });
     try {
         const openai = new OpenAIApi(configuration);
