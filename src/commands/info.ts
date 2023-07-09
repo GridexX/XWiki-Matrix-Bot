@@ -5,7 +5,7 @@ export default async function runInfoCommand(
     client: MatrixClient
 ) {
     // Define the information to be returned
-    const botVersion = "0.0.1";
+    const botVersion = "0.1.0";
     const botDesc =
         "This is an example bot, that aims to provide a XWiki integration into a Matrix environment";
 

@@ -1,4 +1,5 @@
 import {
+    LogService,
     MatrixClient,
     MessageEvent,
     MessageEventContent,
@@ -36,6 +37,8 @@ export default async function runAskCommand(
 
             // Enhance the AI's reply with some basic HTML formatting
             const formattedAiReply = `<i>XWiki Knowledge Base:</i> <b>${aiReply}</b>`;
+
+            LogService.debug("runAskCommand", aiReply);
 
             // Now send that message as a notice
             return client.sendMessage(roomId, {

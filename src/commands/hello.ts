@@ -1,4 +1,5 @@
 import {
+    LogService,
     MatrixClient,
     MentionPill,
     MessageEvent,
@@ -26,6 +27,7 @@ export default async function runHelloCommand(
         html = `Hello ${mention.html}!`;
     }
 
+    LogService.debug("runHelloCommand", text);
     // Now send that message as a notice
     return client.sendMessage(roomId, {
         body: text,

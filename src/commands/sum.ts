@@ -1,4 +1,4 @@
-import { MatrixClient } from "matrix-bot-sdk";
+import { LogService, MatrixClient } from "matrix-bot-sdk";
 import { Configuration, OpenAIApi } from "openai";
 import axios from "axios";
 import { JSDOM } from "jsdom";
@@ -33,7 +33,7 @@ export default async function runSumCommand(
     const article = reader.parse();
 
     if (!article) {
-        console.log("Content is null for URL: ", URL);
+        LogService.error("runSumCommand", `Article empty for url: ${URL}`);
         content = "No Description Provided";
     } else {
         content = article.textContent;
@@ -66,6 +66,6 @@ export default async function runSumCommand(
             formatted_body: summary,
         })
         .catch((error: any) => {
-            console.log(error);
+            LogService.error("runSumCommand", error);
         });
 }

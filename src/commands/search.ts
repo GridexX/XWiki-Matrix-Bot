@@ -10,24 +10,18 @@ import {
 import { MessageSearch } from "../models/messages";
 import config from "../config";
 
-// axios.interceptors.request.use((config) => {
-//     config.headers.Accept = "application/json";
-//     config.headers["User-Agent"] = "nosso";
-//     return config;
-// });
-
 function searchPage(url: string): Promise<AxiosResponse<PageSearchResult>> {
     return axios.get(`${url}?media=json`);
 }
 
+// Get the resume of the article by calling ChatGPT prompt
 async function getResume(content_json: string): Promise<string> {
     // Check if content_json is null or empty
     if (!content_json || content_json.trim() === "") {
-        console.log("Content is null or empty");
+        LogService.warn("Search - getResume", "content empty or null");
         return "No Description Provided";
     }
 
-    // tslint:disable-next-line:no-shadowed-variable
     const truncateText = (text: string, maxTokens: number) => {
         let tokens = text.split(" ");
         if (tokens.length > maxTokens) {
@@ -56,7 +50,7 @@ async function getResume(content_json: string): Promise<string> {
         return apiResponse.data.choices[0].text;
     } catch (error) {
         LogService.error("Search - getResume", error);
-        return "OpenAI failed to resume the text";
+        return "";
     }
 }
 
@@ -78,6 +72,7 @@ async function convertSearchResults(
         data: [],
     };
 
+    // Retrieve each pages and the content for each of them
     const promises = searchResults.map(async (searchResult) => {
         const { xwikiAbsoluteUrl: href, content } = await getPage(
             searchResult.links[0].href
@@ -118,6 +113,7 @@ function createRichMessage(
             <a href=${result.href}>Link</a><br/>
             <i>${result.resume}</i>
         </li>
+        <br/>
         `;
     });
     html += "</ul>";
@@ -142,17 +138,13 @@ export default async function runSearchCommand(
             const result = await convertSearchResults(data.searchResults);
 
             // Return the result to the chat
-            return (
-                client
-                    .sendMessage(roomId, createRichMessage(roomId, ev, result))
-                    // tslint:disable-next-line:no-shadowed-variable
-                    .catch((error: any) => {
-                        console.error(error); // Handle error here
-                    })
-            );
+            return client
+                .sendMessage(roomId, createRichMessage(roomId, ev, result))
+                .catch((error: any) => {
+                    LogService.error("runSearchCommand", error);
+                });
         })
-        // tslint:disable-next-line:no-shadowed-variable
         .catch((error: any) => {
-            console.error(error); // Handle error here
+            LogService.error("runSearchCommand", error);
         });
 }

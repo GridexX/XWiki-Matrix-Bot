@@ -53,6 +53,6 @@ export default async function runMessageCommand(
             LogService.error("runMessageCommand", error);
         })
         .then(() => {
-            LogService.info("runMessageCommand", messages);
+            LogService.debug("runMessageCommand", messages);
         });
 }

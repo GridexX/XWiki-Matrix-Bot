@@ -1,4 +1,4 @@
-import { MatrixClient } from "matrix-bot-sdk";
+import { LogService, MatrixClient } from "matrix-bot-sdk";
 
 export default async function runEchoCommand(
     roomId: string,
@@ -8,6 +8,8 @@ export default async function runEchoCommand(
     const echo = args;
     echo.shift();
     const text = echo.join(" ");
+
+    LogService.debug("runEchoCommand", text);
 
     // Now send that message as a notice
     return client.sendMessage(roomId, {
