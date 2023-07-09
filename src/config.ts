@@ -15,6 +15,12 @@ interface IConfig {
         url: string;
         apiKey: string;
     };
+    redis: {
+        port: number;
+        host: string;
+        username: string;
+        password: string;
+    };
     xwikiUrl: string;
 }
 
@@ -34,6 +40,12 @@ function readConfig(): IConfig {
                 process.env.OPENAI_URL ||
                 "https://api.openai.com/v1/completions",
             apiKey: process.env.OPENAI_API_KEY || "",
+        },
+        redis: {
+            host: process.env.REDIS_HOST || "localhost",
+            port: parseInt(process.env.REDIS_PORT_NUMBER, 10) || 6039,
+            username: process.env.REDIS_USERNAME || "",
+            password: process.env.REDIS_PASSWORD || "",
         },
         xwikiUrl: process.env.XWIKI_URL || "",
     };

@@ -8,6 +8,7 @@ import {
     SimpleFsStorageProvider,
 } from "matrix-bot-sdk";
 import * as path from "path";
+import { RedisClientType, createClient } from "redis";
 import CommandHandler from "./commands/handler";
 import config from "./config";
 
@@ -54,8 +55,26 @@ async function main() {
         AutojoinRoomsMixin.setupOnClient(client);
     }
 
+    // Create the RedisClient for saving last messages
+    const redisClient = createClient({
+        socket: {
+            host: config.redis.host,
+            port: config.redis.port,
+        },
+    });
+
+    redisClient.on("error", (err) => LogService.error("RedisClient", err));
+    redisClient.on("ready", () =>
+        LogService.debug("RedisClient", "Connected successfully")
+    );
+
+    await redisClient.connect();
+
     // Prepare the command handler
-    const commands = new CommandHandler(client);
+    const commands = new CommandHandler(
+        client,
+        redisClient as unknown as RedisClientType<any>
+    );
 
     await commands.start();
     LogService.info("index", "Starting sync...");

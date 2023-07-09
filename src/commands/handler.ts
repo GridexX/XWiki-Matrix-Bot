@@ -6,6 +6,7 @@ import {
     UserID,
 } from "matrix-bot-sdk";
 import * as htmlEscape from "escape-html";
+import { RedisClientType } from "redis";
 import runHelloCommand from "./hello";
 import runPingCommand from "./ping";
 import runEchoCommand from "./echo";
@@ -14,6 +15,8 @@ import runSumCommand from "./sum";
 import runSearchCommand from "./search";
 import runAskCommand from "./ask";
 import listUsers from "./users";
+import { RedisMessage } from "../models/RedisMessage";
+import runMessageCommand from "./messages";
 
 // The prefix required to trigger the bot. The bot will also respond
 // to being pinged directly.
@@ -29,7 +32,10 @@ export default class CommandHandler {
 
     private localpart: string;
 
-    constructor(private client: MatrixClient) {}
+    constructor(
+        private client: MatrixClient,
+        private redisClient: RedisClientType<any>
+    ) {}
 
     public async start() {
         // Populate the variables above (async)
@@ -68,7 +74,26 @@ export default class CommandHandler {
             `${this.userId}:`,
         ];
         const prefixUsed = prefixes.find((p) => event.textBody.startsWith(p));
-        if (!prefixUsed) return; // Not a command (as far as we're concerned)
+        // Not a command (as far as we're concerned)
+        // SAve the message in Redis
+        if (!prefixUsed) {
+            const redisMessage: RedisMessage = {
+                sender: event.sender,
+                text: event.textBody,
+                timestamp: event.timestamp,
+                roomId,
+            };
+            this.redisClient
+                .lPush("messages", JSON.stringify(redisMessage))
+                .then(() =>
+                    LogService.debug(
+                        "RedisClient",
+                        `Entry added ${JSON.stringify(redisMessage)}`
+                    )
+                )
+                .catch((error) => LogService.error("RedisClient", error));
+            return;
+        }
 
         // Check to see what the arguments were to the command
         const args = event.textBody
@@ -112,13 +137,25 @@ export default class CommandHandler {
                     await runAskCommand(roomId, event, args, this.client);
                     break;
                 }
+
+                case "messages": {
+                    await runMessageCommand(
+                        roomId,
+                        ev,
+                        args,
+                        this.client,
+                        this.redisClient
+                    );
+                    break;
+                }
                 default: {
                     const help =
                         "" +
-                        "!aibot search [words]     - Search for pages into an XWiki instance\n" +
-                        "!aibot users              - List users in XWiki \n" +
-                        "!aibot ask [question]     - Ask a question based on XWiki details\n" +
-                        "!aibot help               - This menu\n";
+                        `!${COMMAND_PREFIX} search [words]     - Search for pages into an XWiki instance\n` +
+                        `!${COMMAND_PREFIX} users              - List users in XWiki \n` +
+                        `!${COMMAND_PREFIX} ask [question]     - Ask a question based on XWiki details\n` +
+                        `!${COMMAND_PREFIX} messages           - List last 20 messages` +
+                        `!${COMMAND_PREFIX} help               - This menu\n`;
 
                     const text = `Help menu:\n${help}`;
                     const html = `<b>Help menu:</b><br /><pre><code>${htmlEscape(

@@ -1,9 +1,9 @@
 {
   "name": "xwiki-matrix-bot",
   "version": "0.1.0",
-  "author": "Clément and Arsène",
+  "author": "Clément Christiaens and Arsène Fougerouse",
   "license": "Apache-2.0",
-  "description": "A POC to query the XWiki API within a Matrix Bot",
+  "description": "Query the XWiki API thanks to a Matrix Bot",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/C-Iaens/XWiki-Matrix.git"
@@ -35,7 +35,8 @@
     "jsdom": "^22.1.0",
     "matrix-bot-sdk": "^0.6.6",
     "node-fetch": "3.3.1",
-    "openai": "^3.3.0"
+    "openai": "^3.3.0",
+    "redis": "^4.6.7"
   },
   "devDependencies": {
     "@types/jsdom": "^21.1.1",
