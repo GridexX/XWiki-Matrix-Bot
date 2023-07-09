@@ -1,4 +1,4 @@
-import { LinkSearchResult } from "./search";
+import { LinkSearchResult } from "./searchModel";
 
 export type SearchUserResult = {
     searchResults: SearchUser[];

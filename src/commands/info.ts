@@ -1,14 +1,16 @@
-import { MatrixClient, MessageEvent, MessageEventContent } from "matrix-bot-sdk";
-import * as htmlEscape from "escape-html";
+import { MatrixClient } from "matrix-bot-sdk";
 
-export async function runInfoCommand(roomId: string, event: MessageEvent<MessageEventContent>, args: string[], client: MatrixClient) {
-
+export default async function runInfoCommand(
+    roomId: string,
+    client: MatrixClient
+) {
     // Define the information to be returned
     const botVersion = "0.0.1";
-    const botDesc = "This is an example bot, that aims to provide a XWiki integration into a Matrix environment";
+    const botDesc =
+        "This is an example bot, that aims to provide a XWiki integration into a Matrix environment";
 
     // Format the information text
-    let text = `Bot Version: ${botVersion}\nDescription: ${botDesc}`;
+    const text = `Bot Version: ${botVersion}\nDescription: ${botDesc}`;
 
     // Now send that message as a notice
     return client.sendMessage(roomId, {

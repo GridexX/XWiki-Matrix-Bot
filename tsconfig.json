@@ -9,6 +9,7 @@
         "noImplicitAny": false,
         "sourceMap": true,
         "outDir": "./lib",
+        "skipLibCheck": true,
         "types": [
             "node"
         ],

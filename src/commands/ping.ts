@@ -1,9 +1,10 @@
-import { MatrixClient, MessageEvent, MessageEventContent } from "matrix-bot-sdk";
-import * as htmlEscape from "escape-html";
+import { MatrixClient } from "matrix-bot-sdk";
 
-export async function runPingCommand(roomId: string, event: MessageEvent<MessageEventContent>, args: string[], client: MatrixClient) {
-
-    let text = `Pong!`;
+export default async function runPingCommand(
+    roomId: string,
+    client: MatrixClient
+) {
+    const text = `Pong!`;
 
     // Now send that message as a notice
     return client.sendMessage(roomId, {

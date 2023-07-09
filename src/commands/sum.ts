@@ -1,64 +1,70 @@
-import { MatrixClient, MessageEvent, MessageEventContent } from "matrix-bot-sdk";
+import { MatrixClient } from "matrix-bot-sdk";
 import { Configuration, OpenAIApi } from "openai";
 import axios from "axios";
 import { JSDOM } from "jsdom";
-const Readability = require('@mozilla/readability').Readability;
 
-export async function runSumCommand(roomId: string, event: MessageEvent<MessageEventContent>, args: string[], client: MatrixClient) {
+const { Readability } = require("@mozilla/readability");
+
+const truncateText = (text: string, maxTokens: number) => {
+    let tokens = text.split(" ");
+    if (tokens.length > maxTokens) {
+        tokens = tokens.slice(0, maxTokens);
+    }
+    return tokens.join(" ");
+};
+
+export default async function runSumCommand(
+    roomId: string,
+    args: string[],
+    client: MatrixClient
+) {
     const URL = args[1];
-    const apiKey = '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';
+    const apiKey = "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";
     const maxTokens = 512;
-    const promptEnding = 'Please return a summary of the information above in a short paragraph in natural language';
-
-    // tslint:disable-next-line:no-shadowed-variable
-    const truncateText = (text: string, maxTokens: number) => {
-        let tokens = text.split(' ');
-        if (tokens.length > maxTokens) {
-            tokens = tokens.slice(0, maxTokens);
-        }
-        return tokens.join(' ');
-    };
+    const promptEnding =
+        "Please return a summary of the information above in a short paragraph in natural language";
 
     let content;
-    try {
-        const response = await axios.get(URL);
-        const doc = new JSDOM(response.data);
-        const reader = new Readability(doc.window.document);
-        const article = reader.parse();
 
-        if (!article) {
-            console.log("Content is null for URL: ", URL);
-            content = "No Description Provided";
-        } else {
-            content = article.textContent;
-        }
+    const response = await axios.get(URL);
+    const doc = new JSDOM(response.data);
+    const reader = new Readability(doc.window.document);
+    const article = reader.parse();
 
-        const prompt = truncateText(content, maxTokens - promptEnding.length) + promptEnding;
+    if (!article) {
+        console.log("Content is null for URL: ", URL);
+        content = "No Description Provided";
+    } else {
+        content = article.textContent;
+    }
 
-        const configuration = new Configuration({
-            apiKey: apiKey,
-        });
+    const prompt =
+        truncateText(content, maxTokens - promptEnding.length) + promptEnding;
 
-        const openai = new OpenAIApi(configuration);
+    const configuration = new Configuration({
+        apiKey,
+    });
 
-        const apiResponse = await openai.createCompletion({
-            model: "text-davinci-003",
-            prompt: prompt,
-            max_tokens: maxTokens,
-            temperature: 0.4,
-        });
+    const openai = new OpenAIApi(configuration);
 
-        let summary = apiResponse.data.choices[0].text.trim();
-        summary = summary.replace(/^\.\n/, '');
+    const apiResponse = await openai.createCompletion({
+        model: "text-davinci-003",
+        prompt,
+        max_tokens: maxTokens,
+        temperature: 0.4,
+    });
 
-        return client.sendMessage(roomId, {
+    let summary = apiResponse.data.choices[0].text.trim();
+    summary = summary.replace(/^\.\n/, "");
+
+    return client
+        .sendMessage(roomId, {
             body: summary,
             msgtype: "m.notice",
             format: "org.matrix.custom.html",
             formatted_body: summary,
+        })
+        .catch((error: any) => {
+            console.log(error);
         });
-
-    } catch (error) {
-        console.log("Error: ", error);
-    }
 }

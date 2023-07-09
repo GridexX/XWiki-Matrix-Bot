@@ -1,7 +1,17 @@
-import { MatrixClient, MentionPill, MessageEvent, MessageEventContent } from "matrix-bot-sdk";
+import {
+    MatrixClient,
+    MentionPill,
+    MessageEvent,
+    MessageEventContent,
+} from "matrix-bot-sdk";
 import * as htmlEscape from "escape-html";
 
-export async function runHelloCommand(roomId: string, event: MessageEvent<MessageEventContent>, args: string[], client: MatrixClient) {
+export default async function runHelloCommand(
+    roomId: string,
+    event: MessageEvent<MessageEventContent>,
+    args: string[],
+    client: MatrixClient
+) {
     // The first argument is always going to be us, so get the second argument instead.
     let sayHelloTo = args[1];
     if (!sayHelloTo) sayHelloTo = event.sender;

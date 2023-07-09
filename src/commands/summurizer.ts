@@ -1,19 +1,18 @@
 import type { RequestInfo, RequestInit, Response } from "node-fetch";
+
 interface CompletionResponse {
     choices: {
         text: string;
     }[];
 }
 
-export async function summarize(content: string): Promise<string> {
+export default async function summarize(content: string): Promise<string> {
     const API_URL = "https://api.openai.com/v1/completions";
     const API_KEY = "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";
 
     const data = {
         model: "text-davinci-003",
-        prompt:
-            content +
-            "Main goal: Summurize all the information above in natural language",
+        prompt: `${content} Main goal: Summurize all the information above in natural language`,
         max_tokens: 1024,
     };
 

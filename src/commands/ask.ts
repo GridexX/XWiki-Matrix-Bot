@@ -5,27 +5,21 @@ import {
 } from "matrix-bot-sdk";
 import axios from "axios";
 
-export async function runAskCommand(
+export default async function runAskCommand(
     roomId: string,
     event: MessageEvent<MessageEventContent>,
     args: string[],
     client: MatrixClient
 ) {
-    const xwiki_ai_api =
+    const XWIKI_AI_API =
         process.env.XWIKI_URL ||
         "http://192.168.150.82:15480/xwiki/rest/gptsearch/chat/completion";
 
     const userPrompt = args.join(" ");
 
-    axios.interceptors.request.use((config) => {
-        config.headers.Accept = "application/json";
-        config.headers["User-Agent"] = "nosso";
-        return config;
-    });
-
     axios
         .post(
-            xwiki_ai_api,
+            XWIKI_AI_API,
             {
                 model: "gpt-3.5-turbo",
                 messages: [
@@ -37,11 +31,11 @@ export async function runAskCommand(
                 timeout: 8000, // 20 seconds
             }
         )
-        .then(function (response) {
-            let aiReply = response.data.choices[0].message.content;
+        .then((response) => {
+            const aiReply = response.data.choices[0].message.content;
 
             // Enhance the AI's reply with some basic HTML formatting
-            let formattedAiReply = `<i>XWiki Knowledge Base:</i> <b>${aiReply}</b>`;
+            const formattedAiReply = `<i>XWiki Knowledge Base:</i> <b>${aiReply}</b>`;
 
             // Now send that message as a notice
             return client.sendMessage(roomId, {
@@ -51,11 +45,11 @@ export async function runAskCommand(
                 formatted_body: formattedAiReply,
             });
         })
-        .catch(function (error) {
+        .catch((error) => {
             // Default message if the server doesn't reply within 20s
             const defaultMessage =
                 "The assistant is currently unavailable. Please try again later.";
-            const formattedDefaultMessage = `<i>${defaultMessage}</i>`;
+            const formattedDefaultMessage = `<i>${defaultMessage} ${error}</i>`;
 
             // Send default message as a notice
             return client.sendMessage(roomId, {

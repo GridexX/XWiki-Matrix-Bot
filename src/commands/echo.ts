@@ -1,11 +1,13 @@
-import { MatrixClient, MessageEvent, MessageEventContent } from "matrix-bot-sdk";
-import * as htmlEscape from "escape-html";
+import { MatrixClient } from "matrix-bot-sdk";
 
-export async function runEchoCommand(roomId: string, event: MessageEvent<MessageEventContent>, args: string[], client: MatrixClient) {
-
-	let echo = args;
-	echo.shift();
-    let text = echo.join(' ');
+export default async function runEchoCommand(
+    roomId: string,
+    args: string[],
+    client: MatrixClient
+) {
+    const echo = args;
+    echo.shift();
+    const text = echo.join(" ");
 
     // Now send that message as a notice
     return client.sendMessage(roomId, {

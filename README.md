@@ -4,33 +4,35 @@
   <h1>MatriXWiki</h1>
   
   <p>
-    An awesome bot to connect XWiki to Matrix ! 
+    An awesome bot to connect XWiki to Matrix !
   </p>
-</div>
+
   
   
 <!-- Badges -->
 <p>
-  <a href="https://github.com/C-Iaens/XWiki-Matrix/graphs/contributors">
-    <img src="https://img.shields.io/github/contributors/C-Iaens/XWiki-Matrix" alt="contributors" />
+  <a href="https://github.com/GridexX/XWiki-Matrix-Bot/graphs/contributors">
+    <img src="https://img.shields.io/github/contributors/GridexX/XWiki-Matrix-Bot" alt="contributors" />
   </a>
   <a href="">
-    <img src="https://img.shields.io/github/last-commit/C-Iaens/XWiki-Matrix" alt="last update" />
+    <img src="https://img.shields.io/github/last-commit/GridexX/XWiki-Matrix-Bot" alt="last update" />
   </a>
-  <a href="https://github.com/C-Iaens/XWiki-Matrix/network/members">
-    <img src="https://img.shields.io/github/forks/C-Iaens/XWiki-Matrix" alt="forks" />
+  <a href="https://github.com/GridexX/XWiki-Matrix-Bot/network/members">
+    <img src="https://img.shields.io/github/forks/GridexX/XWiki-Matrix-Bot" alt="forks" />
   </a>
-  <a href="https://github.com/C-Iaens/XWiki-Matrix/stargazers">
-    <img src="https://img.shields.io/github/stars/C-Iaens/XWiki-Matrix" alt="stars" />
+  <a href="https://github.com/GridexX/XWiki-Matrix-Bot/stargazers">
+    <img src="https://img.shields.io/github/stars/GridexX/XWiki-Matrix-Bot" alt="stars" />
   </a>
-  <a href="https://github.com/C-Iaens/XWiki-Matrix/issues/">
-    <img src="https://img.shields.io/github/issues/C-Iaens/XWiki-Matrix" alt="open issues" />
+  <a href="https://github.com/GridexX/XWiki-Matrix-Bot/issues/">
+    <img src="https://img.shields.io/github/issues/GridexX/XWiki-Matrix-Bot" alt="open issues" />
   </a>
-  <a href="https://github.com/C-Iaens/XWiki-Matrix/blob/master/LICENSE">
-    <img src="https://img.shields.io/github/license/C-Iaens/XWiki-Matrix.svg" alt="license" />
+  <a href="https://github.com/GridexX/XWiki-Matrix-Bot/blob/master/LICENSE">
+    <img src="https://img.shields.io/github/license/GridexX/XWiki-Matrix-Bot.svg" alt="license" />
   </a>
 </p>
    
+</div>
+
 <br />
 
 <!-- Table of Contents -->
@@ -43,19 +45,14 @@
   - [:toolbox: Getting Started](#toolbox-getting-started)
     - [:bangbang: Prerequisites](#bangbang-prerequisites)
     - [:gear: Installation](#gear-installation)
-    - [:running: Run Locally](#running-run-locally)
-    - [:triangular\_flag\_on\_post: C-Iaens/XWiki-Matrixoyment](#triangular_flag_on_post-c-iaensxwiki-matrixoyment)
-  - [:eyes: Usage](#eyes-usage)
-    - [Running / Building](#running--building)
-    - [Configuration](#configuration)
-    - [Project structure](#project-structure)
+    - [:triangular\_flag\_on\_post: Deployment](#triangular_flag_on_post-deployment)
+    - [:telescope: Project structure](#telescope-project-structure)
       - [`src/index.ts`](#srcindexts)
       - [`src/commands/handler.ts`](#srccommandshandlerts)
-      - [`src/commands/hello.ts`](#srccommandshellots)
+      - [`src/commands`](#srccommands)
       - [`src/config.ts`](#srcconfigts)
-      - [`lib/`](#lib)
-      - [`storage/`](#storage)
-    - [Help!](#help)
+    - [`lib/`](#lib)
+    - [`storage/`](#storage)
   - [:wave: Contributing](#wave-contributing)
   - [:warning: License](#warning-license)
   - [:handshake: Contact](#handshake-contact)
@@ -65,48 +62,23 @@
 <!-- About the Project -->
 ## :star2: About the Project
 
-This project aims to Retrieve information of an XWiki instance from a Matrix Bot. 
+This project aims to retrieve information located in a XWiki instance from to a Matrix Bot. It uses under the hood the REST APi of XWiki and ChatGPT to provide resume of Wiki's pages.
 
 <!-- Features -->
 ### :dart: Features
 
 - Search pages in the wiki and get a summary of each of them
 - Retrieve the list of users
+- Ask for questions resumed from the Wiki
 
 
 
 <!-- Env Variables -->
 ### :key: Environment Variables
 
-To run this project, you will need to add the following environment variables to your `config/default.yaml` file:
-```yaml
+To run this project, you will need to copy the `.env.example` file into a `.env` and fill values for all variables.
 
-# Where the homeserver's Client-Server API is located. Typically this
-# is where clients would be connecting to in order to send messages.
-homeserverUrl: "https://matrix.xwiki.com"
-
-pantalaimon:
-  use: false
-  username: "USERNAME"
-  password: "PASSWORD"
-
-# An access token for the bot to use. Learn how to get an access token
-# at https://t2bot.io/docs/access_tokens
-accessToken: "ACCESS_TOKEN"
-
-# Whether or not to autojoin rooms when invited.
-autoJoin: true
-
-# Location on disk for where to store various bot information.
-dataPath: "storage"
-
-xwikiUrl: "https://www.xwiki.org"
-To run this project, you will need to add the following environment variables to your .env file
-```
-
-`API_KEY`
-
-`ANOTHER_API_KEY`
+⚠️ You will need an `API_KEY` in order to use ChatGPT resume functions !
 
 <!-- Getting Started -->
 ## 	:toolbox: Getting Started
@@ -114,95 +86,70 @@ To run this project, you will need to add the following environment variables to
 <!-- Prerequisites -->
 ### :bangbang: Prerequisites
 
-This project uses Npm as package manager
+- This project uses Npm as package manager.
+- A Matrix Bot setup is needed to query commands. You can follow this [tutorial](https://turt2live.github.io/matrix-bot-sdk/tutorial-bot.html) to creates one.
 
 
 <!-- Installation -->
 ### :gear: Installation
 
-Install with npm:
+1. Clone the project
 
-```bash
-  cd XWiki-Matrix
-  npm install
-```
-   
-<!-- Run Locally -->
-### :running: Run Locally
+    ```bash
+    git clone https://github.com/GridexX/XWiki-Matrix-Bot.git
+    ```
 
-Clone the project
+2. Go to the project directory
 
-```bash
-  git clone https://github.com/C-Iaens/XWiki-Matrix.git
-```
+    ```bash
+    cd XWiki-Matrix-Bot
+    ```
 
-Go to the project directory
+3. Install dependencies
 
-```bash
-  cd XWiki-Matrix
-```
+    ```bash
+    npm install
+    ```
 
-Install dependencies
+4. Start the application in development mode
 
-```bash
-  npm install
-```
+    ```bash
+      npm run start:dev
+    ```
 
-Start the server
+<!-- Deployment -->
+### :triangular_flag_on_post: Deployment
 
-```bash
-  npm run start:dev
-```
+To deploy this project, you should first completed the getting started and follow those steps 
 
-<!-- C-Iaens/XWiki-Matrixoyment -->
-### :triangular_flag_on_post: C-Iaens/XWiki-Matrixoyment
+1. Compile TypeScript code into JavaScript:
 
-To C-Iaens/XWiki-Matrixoy this project, you should first completed the getting started and build the project:
+    ```bash
+    npm run build
+    ```
 
-```bash
-  npm run build
-```
+2. Build the Docker image:
 
-Then build the Docker image:
-```bash
-docker build . -t <NAME>
-```
+    ```bash
+    docker build . -t <NAME>
+    ```
 
-Then run the image into a production server:
-```bash
-docker run <options> <NAME>
-```
+3. Upload the image to the docker hub
 
-<!-- Usage -->
-## :eyes: Usage
+    ```bash
+    docker push <NAME>
+    ```
 
-### Running / Building
+4. Then run the image into a production server:
+  
+  ```bash
+  docker run <options> <NAME>
+  ```
 
-After clicking the 'use this template' button and cloning the repo, you'll need to install the dependencies
-and open an editor to get started. This assumes you have at least **NodeJS 12 or higher**.
+<!-- Project Structure -->
+### :telescope: Project structure
 
-1. Replace this README with something useful.
-2. Update your project's details in `package.json`.
-3. Run `npm install` to get the dependencies.
-
-To build it: `npm run build`.
-
-To run it: `npm run start:dev`
-
-To check the lint: `npm run lint`
-
-*Think this should have a Docker image built-in? Add a 👍 to [this issue](https://github.com/turt2live/matrix-bot-sdk-bot-template/issues/1).*
-
-### Configuration
-
-This template uses a package called `config` to manage configuration. The default configuration is offered
-as `config/default.yaml`. Copy/paste this to `config/development.yaml` and `config/production.yaml` and edit
-them accordingly for your environment.
-
-### Project structure
-
-This is a somewhat opinionated template that is runnable out of the box. The project is TypeScript with
-a linter that matches the bot-sdk itself. All the good bits of the bot are under `src/`.
+This is a somewhat opinionated template that is runnable out of the box. The project is TypeScript with a linter that matches the bot-sdk itself. All the good bits of the bot are under `src/`.
 
 #### `src/index.ts`
 
@@ -215,34 +162,28 @@ modification - most of the bot is elsewhere.
 When the bot receives a command (see `index.ts` for handoff) it gets processed here. The command structure
 is fairly manual, but a basic help menu and processing for a single command is there.
 
-#### `src/commands/hello.ts`
+#### `src/commands`
 
-This is the bot's `!bot hello` command. It doesn't do much, but it is an example.
+Here are located the commands functions used.
+Type `aibot help` to have a list of the available comands
 
 #### `src/config.ts`
 
 This is simply a typescript interface for your config so you can make use of types.
 
-#### `lib/`
+### `lib/`
 
 This is where the project's build files go. Not really much to see here.
 
-#### `storage/`
+### `storage/`
 
 This is the default storage location. Also not much to see here.
 
-### Help!
-
-Come visit us in [#matrix-bot-sdk:t2bot.io](https://matrix.to/#/#matrix-bot-sdk:t2bot.io) on Matrix if you're
-having trouble with this project.
-
-
 ## :wave: Contributing
 
-<a href="https://github.com/C-Iaens/XWiki-Matrix/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=C-Iaens/XWiki-Matrix" />
+<a href="https://github.com/GridexX/XWiki-Matrix-Bot/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=GridexX/XWiki-Matrix-Bot" />
 </a>
-
 
 Contributions are always welcome!
 
@@ -250,12 +191,9 @@ Contributions are always welcome!
 
 Distributed under the Apache License. See `LICENSE.md` for more information.
 
-
 <!-- Contact -->
 ## :handshake: Contact
 
-GridexX - [@gridexx](https://twitter.com/gridexx) - arsene.fougerouse@xwiki.com
+GridexX - [@gridexx](https://twitter.com/gridexx) - [arsene582@gmail.com](mailto:arsene582@gmail.com)
 
-Project Link: [https://github.com/C-Iaens/XWiki-Matrix](https://github.com/C-Iaens/XWiki-Matrix)
-
-
+Project Link: [https://github.com/GridexX/XWiki-Matrix-Bot](https://github.com/GridexX/XWiki-Matrix-Bot)

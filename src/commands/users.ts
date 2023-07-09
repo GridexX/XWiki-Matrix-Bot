@@ -1,18 +1,12 @@
 import axios, { AxiosResponse } from "axios";
+import { MatrixClient, RichReply } from "matrix-bot-sdk";
+import { MessageListUser } from "../models/messages";
+import { QUERY_API_URL } from "../constants/api";
 import {
-    MatrixClient,
-    MessageEvent,
-    MessageEventContent,
-    RichReply,
-} from "matrix-bot-sdk";
-import {
-    PageSearchResult,
-    SearchResult,
-    SearchResults,
-} from "../models/search";
-import { MessageListUser, MessageSearch } from "../models/messages";
-import { QUERY_API_URL, XWIKI_URL } from "../constants/api";
-import { SearchUser, SearchUserResult, UserPageData } from "../models/user";
+    SearchUser,
+    SearchUserResult,
+    UserPageData,
+} from "../models/userModel";
 
 async function searchUsers(): Promise<AxiosResponse<SearchUserResult>> {
     const url = `${QUERY_API_URL}?media=json&q=object:XWiki.XWikiUsers`;
@@ -28,22 +22,23 @@ async function searchUserPage(url: string): Promise<string> {
 }
 
 async function convertUsers(users: SearchUser[]): Promise<MessageListUser> {
-    let messageUser: MessageListUser = {
+    const messageUser: MessageListUser = {
         results: users.length,
         data: [],
     };
 
-    for (let index = 0; index < users.length; index++) {
-        const user = users[index];
-
+    const promises = users.map(async (user) => {
         const href = await searchUserPage(user.links[0].href);
 
-        messageUser.data.push({
+        return {
             name: user.pageName,
             modified: new Date(user.modified),
             href,
-        });
-    }
+        };
+    });
+
+    const userData = await Promise.all(promises);
+    messageUser.data = userData;
 
     return messageUser;
 }
@@ -66,14 +61,18 @@ function createRichMessage(
     });
     html += "</ul>";
     const reply = RichReply.createFor(roomId, ev, text, html); // Note that we're using the raw event, not the parsed one!
-    reply["msgtype"] = "m.notice";
+    reply.msgtype = "m.notice";
     return reply;
 }
 
-export async function listUsers(roomId: string, ev: any, client: MatrixClient) {
+export default async function listUsers(
+    roomId: string,
+    ev: any,
+    client: MatrixClient
+) {
     searchUsers()
         .then(async (response: AxiosResponse<SearchUserResult>) => {
-            const data = response.data;
+            const { data } = response;
             const result = await convertUsers(data.searchResults);
             return client
                 .sendMessage(roomId, createRichMessage(roomId, ev, result))

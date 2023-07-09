@@ -1,34 +1,24 @@
-import { MAX_ROW, QUERY_API_URL } from "../constants/api";
 import axios, { AxiosResponse } from "axios";
-import {
-    MatrixClient,
-    MessageEvent,
-    MessageEventContent,
-    RichReply,
-} from "matrix-bot-sdk";
+import { LogService, MatrixClient, RichReply } from "matrix-bot-sdk";
+import { Configuration, OpenAIApi } from "openai";
+import { MAX_ROW, QUERY_API_URL } from "../constants/api";
 import {
     PageSearchResult,
     SearchResult,
     SearchResults,
-} from "../models/search";
-import { Configuration, OpenAIApi } from "openai";
+} from "../models/searchModel";
 import { MessageSearch } from "../models/messages";
 
-const xwikiUrl = process.env.XWIKI_URL || "https://www.xwiki.org";
-// const xwikiUsername = process.env.XWIKI_USERNAME;
-// const xwikiPassword = process.env.XWIKI_PASSWORD;
-
-axios.interceptors.request.use((config) => {
-    config.headers.Accept = "application/json";
-    config.headers["User-Agent"] = "nosso";
-    return config;
-});
+// axios.interceptors.request.use((config) => {
+//     config.headers.Accept = "application/json";
+//     config.headers["User-Agent"] = "nosso";
+//     return config;
+// });
 
 function searchPage(url: string): Promise<AxiosResponse<PageSearchResult>> {
     return axios.get(`${url}?media=json`);
 }
 
-// @ts-ignore
 async function getResume(content_json: string): Promise<string> {
     // Check if content_json is null or empty
     if (!content_json || content_json.trim() === "") {
@@ -53,16 +43,20 @@ async function getResume(content_json: string): Promise<string> {
     const configuration = new Configuration({
         apiKey: "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",
     });
+    try {
+        const openai = new OpenAIApi(configuration);
 
-    const openai = new OpenAIApi(configuration);
-
-    const apiResponse = await openai.createCompletion({
-        model: "text-davinci-003",
-        prompt: prompt,
-        max_tokens: maxTokens,
-        temperature: 0.4,
-    });
-    return apiResponse.data.choices[0].text;
+        const apiResponse = await openai.createCompletion({
+            model: "text-davinci-003",
+            prompt,
+            max_tokens: maxTokens,
+            temperature: 0.4,
+        });
+        return apiResponse.data.choices[0].text;
+    } catch (error) {
+        LogService.error("Search - getResume", error);
+        return "OpenAI failed to resume the text";
+    }
 }
 
 function searchXWiki(query: string): Promise<AxiosResponse<SearchResults>> {
@@ -75,23 +69,21 @@ async function getPage(url: string): Promise<PageSearchResult> {
     return pageResult.data;
 }
 
-// This function takes the results from the REST API and converts them into message data for the BOT
 async function convertSearchResults(
     searchResults: SearchResult[]
 ): Promise<MessageSearch> {
-    let messageSearch: MessageSearch = {
+    const messageSearch: MessageSearch = {
         results: searchResults.length,
         data: [],
     };
 
-    for (let index = 0; index < searchResults.length; index++) {
-        const searchResult = searchResults[index];
+    const promises = searchResults.map(async (searchResult) => {
         const { xwikiAbsoluteUrl: href, content } = await getPage(
             searchResult.links[0].href
         );
         const resume = await getResume(content);
 
-        messageSearch.data.push({
+        return {
             author: searchResult.author,
             authorName: searchResult.authorName,
             modified: new Date(searchResult.modified),
@@ -100,8 +92,11 @@ async function convertSearchResults(
             score: searchResult.score,
             href,
             resume,
-        });
-    }
+        };
+    });
+
+    const searchData = await Promise.all(promises);
+    messageSearch.data = searchData;
 
     return messageSearch;
 }
@@ -126,23 +121,23 @@ function createRichMessage(
     });
     html += "</ul>";
     const reply = RichReply.createFor(roomId, ev, text, html); // Note that we're using the raw event, not the parsed one!
-    reply["msgtype"] = "m.notice";
+    reply.msgtype = "m.notice";
     return reply;
 }
 
-export async function runSearchCommand(
+export default async function runSearchCommand(
     roomId: string,
     ev: any,
     args: string[],
     client: MatrixClient
 ) {
-    let echo = args;
+    const echo = args;
     echo.shift();
     const query = echo.join(" ");
 
     searchXWiki(query)
         .then(async (response: AxiosResponse<SearchResults>) => {
-            const data = response.data;
+            const { data } = response;
             const result = await convertSearchResults(data.searchResults);
 
             // Return the result to the chat
