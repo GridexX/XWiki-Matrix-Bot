@@ -1,0 +1,8 @@
+assets/
+lib/
+node-modules/
+storage/
+.env.example
+.eslintrc.json
+docker-compose.yml
+README.md
