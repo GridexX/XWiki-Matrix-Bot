@@ -10,7 +10,7 @@ export default async function runInfoCommand(
         "This is an example bot, that aims to provide a XWiki integration into a Matrix environment";
 
     // Format the information text
-    const text = `Bot Version: ${botVersion}\nDescription: ${botDesc}`;
+    const text = `AIbot Version: ${botVersion}\nDescription: ${botDesc}`;
 
     // Now send that message as a notice
     return client.sendMessage(roomId, {

@@ -19,7 +19,7 @@ LogService.setLogger(new RichConsoleLogger());
 LogService.setLevel(LogLevel.DEBUG);
 
 // Print something so we know the bot is working
-LogService.info("index", "Bot starting...");
+LogService.info("index", "AIbot starting...");
 
 // This is the startup closure where we give ourselves an async context
 async function main() {
